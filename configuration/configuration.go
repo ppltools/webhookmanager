@@ -144,6 +144,9 @@ func parseMutatingTemplate(mutatingConfig *admissionregistrationv1beta1.Mutating
 		}
 		return mutatingWHs, nil
 	}
+	if len(mutatingConfig.Webhooks) == 0 {
+		return mutatingConfig.Webhooks, nil
+	}
 
 	templateBytes, err := json.Marshal(mutatingConfig.Webhooks)
 	if err != nil {
@@ -163,6 +166,9 @@ func parseValidatingTemplate(validatingConfig *admissionregistrationv1beta1.Vali
 			return nil, err
 		}
 		return validatingWHs, nil
+	}
+	if len(validatingConfig.Webhooks) == 0 {
+		return validatingConfig.Webhooks, nil
 	}
 
 	templateBytes, err := json.Marshal(validatingConfig.Webhooks)
