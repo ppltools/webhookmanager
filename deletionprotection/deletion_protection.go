@@ -41,7 +41,7 @@ func ValidateNamespaceDeletion(c client.Client, namespace *v1.Namespace) error {
 		}
 	}
 	if activeCount > 0 {
-		return fmt.Errorf("forbidden by ResourcesProtectionDeletion for %s=%s and active pods %d>0", activeCount)
+		return fmt.Errorf("forbidden by ResourcesProtectionDeletion for active pods %d>0", activeCount)
 	}
 	return nil
 }
@@ -51,7 +51,7 @@ func ValidateCRDDeletion(c client.Client, obj metav1.Object, gvk schema.GroupVer
 	objList.SetAPIVersion(gvk.GroupVersion().String())
 	objList.SetKind(gvk.Kind)
 	if err := c.List(context.TODO(), objList, client.InNamespace(v1.NamespaceAll)); err != nil {
-		return fmt.Errorf("failed to list CRs of %v: %v", gvk, err)
+		return fmt.Errorf("forbidden by ResourcesProtectionDeletion for list cr error: %v", err)
 	}
 
 	var activeCount int
@@ -61,7 +61,7 @@ func ValidateCRDDeletion(c client.Client, obj metav1.Object, gvk schema.GroupVer
 		}
 	}
 	if activeCount > 0 {
-		return fmt.Errorf("forbidden by ResourcesProtectionDeletion for %s=%s and active CRs %d>0", activeCount)
+		return fmt.Errorf("forbidden by ResourcesProtectionDeletion for active CRs %d>0", activeCount)
 	}
 	return nil
 }
