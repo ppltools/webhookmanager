@@ -28,6 +28,10 @@ func GetHost() string {
 		return h
 	}
 
+	if len(GetServiceName()) > 0 {
+		return ""
+	}
+
 	ip := "127.0.0.1"
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
