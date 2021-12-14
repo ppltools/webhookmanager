@@ -18,12 +18,27 @@ limitations under the License.
 package util
 
 import (
+	"net"
 	"os"
 	"strconv"
 )
 
 func GetHost() string {
-	return os.Getenv("WEBHOOK_HOST")
+	if h := os.Getenv("WEBHOOK_HOST"); len(h) > 0 {
+		return h
+	}
+
+	ip := "127.0.0.1"
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ip
+	}
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
+			return ipnet.IP.String()
+		}
+	}
+	return ip
 }
 
 func GetPort() int {

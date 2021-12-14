@@ -71,7 +71,7 @@ func Ensure(c *config.Config, kubeClient clientset.Interface, handlers map[strin
 			wh.ClientConfig.Service.Namespace = c.GetNamespace()
 			wh.ClientConfig.Service.Name = c.GetServiceName()
 		}
-		if host := c.GetWebhookHost(); len(host) > 0 && wh.ClientConfig.Service != nil {
+		if host := c.GetWebhookHost(); len(host) > 0 {
 			convertClientConfig(&wh.ClientConfig, host, c.GetWebhookPort())
 		}
 		mutatingWHs = append(mutatingWHs, *wh)
@@ -95,7 +95,7 @@ func Ensure(c *config.Config, kubeClient clientset.Interface, handlers map[strin
 			wh.ClientConfig.Service.Namespace = c.GetNamespace()
 			wh.ClientConfig.Service.Name = c.GetServiceName()
 		}
-		if host := c.GetWebhookHost(); len(host) > 0 && wh.ClientConfig.Service != nil {
+		if host := c.GetWebhookHost(); len(host) > 0 {
 			convertClientConfig(&wh.ClientConfig, host, c.GetWebhookPort())
 		}
 		validatingWHs = append(validatingWHs, *wh)
@@ -131,9 +131,12 @@ func getPath(clientConfig *admissionregistrationv1beta1.WebhookClientConfig) (st
 }
 
 func convertClientConfig(clientConfig *admissionregistrationv1beta1.WebhookClientConfig, host string, port int) {
-	url := fmt.Sprintf("https://%s:%d%s", host, port, *clientConfig.Service.Path)
+	path, _ := getPath(clientConfig)
+	url := fmt.Sprintf("https://%s:%d%s", host, port, path)
 	clientConfig.URL = &url
-	clientConfig.Service = nil
+	if clientConfig.Service != nil {
+		clientConfig.Service = nil
+	}
 }
 
 func parseMutatingTemplate(mutatingConfig *admissionregistrationv1beta1.MutatingWebhookConfiguration) ([]admissionregistrationv1beta1.MutatingWebhook, error) {
