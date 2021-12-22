@@ -170,8 +170,12 @@ func SetSecretName(secretName string) SetOption {
 
 func SetWehbookAddr(host string, port int) SetOption {
 	return func(c *Config) {
-		c.Webhook.Host = host
-		c.Webhook.Port = port
+		if len(c.Webhook.Host) != 0 {
+			c.Webhook.Host = host
+		}
+		if c.Webhook.Port != 0 {
+			c.Webhook.Port = port
+		}
 	}
 }
 
